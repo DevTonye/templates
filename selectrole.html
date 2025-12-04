@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Choose Your Role</title>
+    <style>
+        body {
+    background-color: #fff;
+    color: #000;
+    font-family: Arial, sans-serif;
+    display: flex;
+    height: 100vh;
+    justify-content: center;
+    align-items: center;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
+
+.container {
+    text-align: center;
+    max-width: 600px;
+    width: 100%;
+}
+
+h1 {
+    margin-bottom: 20px;
+    font-size: 2rem;
+}
+
+p {
+    margin-bottom: 40px;
+    color: #555;
+}
+
+.roles {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.role {
+    border: none;
+    border-radius: 50px;
+    padding: 20px 35px;
+    text-decoration: none;
+    color: #fff;
+    font-size: 18px;
+    font-weight: bold;
+    transition: transform 0.2s, box-shadow 0.2s;
+    cursor: pointer;
+    flex: 1;
+    min-width: 180px;
+    max-width: 220px;
+}
+
+.role[value="service_provider"] {
+    background: #2563EB;
+}
+
+.role[value="client"] {
+    background: #16A34A;
+}
+
+.role:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+}
+
+.role:active {
+    transform: translateY(-1px);
+}
+
+/* Mobile view - stack buttons vertically */
+@media (max-width: 768px) {
+    .roles {
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .role {
+        width: 100%;
+        min-width: unset;
+        max-width: 280px;
+        padding: 18px 30px;
+        font-size: 16px;
+        margin: 0 auto;
+    }
+
+    h1 {
+        font-size: 1.5rem;
+    }
+
+    p {
+        font-size: 0.95rem;
+        margin-bottom: 30px;
+    }
+}
+
+/* Small mobile devices */
+@media (max-width: 480px) {
+    body {
+        padding: 16px;
+    }
+    
+    .role {
+        padding: 16px 25px;
+        font-size: 15px;
+        max-width: 250px;
+        border-radius: 45px;
+    }
+    
+    h1 {
+        font-size: 1.4rem;
+        margin-bottom: 16px;
+    }
+    
+    p {
+        font-size: 0.9rem;
+        margin-bottom: 25px;
+    }
+}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Select Your Role</h1>
+        <p>Please choose whether you want to offer services or request them.</p>
+        <form method="POST">
+            <div class="roles">
+                <button type="submit" name="role" value="service_provider" class="role">Service Provider</button>
+                <button type="submit" name="role" value="client" class="role">Client</button>
+            </div>
+        </form>
+    </div>
+</body>

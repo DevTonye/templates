@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Business Info Settings - MonoSlot</title>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --bg: #FFFFFF;
+            --text-main: #0F172A;
+            --text-sub: #64748B;
+            --accent: #000000;
+            --highlight: #F1F5F9;
+            --border: #E2E8F0;
+            --radius: 16px;
+            --danger: #EF4444;
+            --success: #22C55E;
+            --tag-bg: #F8FAFC;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Manrope', sans-serif; }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text-main);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* --- Reused Sidebar --- */
+        .sidebar { width: 240px; border-right: 1px solid var(--border); padding: 30px; display: flex; flex-direction: column; justify-content: space-between; }
+        .logo { font-weight: 800; font-size: 22px; letter-spacing: -0.5px; margin-bottom: 50px; display: flex; align-items: center; gap: 10px; }
+        .nav-item { display: flex; align-items: center; gap: 12px; padding: 12px 0; color: var(--text-sub); font-weight: 500; cursor: pointer; transition: 0.2s; }
+        .nav-item:hover, .nav-item.active { color: var(--text-main); font-weight: 700; }
+        .user-mini { display: flex; align-items: center; gap: 10px; }
+        .user-avatar { width: 32px; height: 32px; background: #000; border-radius: 50%; }
+
+        /* --- Main Layout --- */
+        .main {
+            flex: 1;
+            padding: 40px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .header-title {
+            font-size: 32px;
+            font-weight: 800;
+            letter-spacing: -1px;
+            margin-bottom: 40px;
+        }
+
+        /* --- Settings Layout Container --- */
+        .settings-container {
+            display: grid;
+            grid-template-columns: 240px 1fr;
+            gap: 60px;
+            max-width: 1000px;
+        }
+
+        /* --- Settings Menu (Left) --- */
+        .settings-menu {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .settings-tab {
+            padding: 12px 16px;
+            border-radius: 12px;
+            font-weight: 600;
+            color: var(--text-sub);
+            cursor: pointer;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .settings-tab:hover {
+            background: var(--highlight);
+            color: var(--text-main);
+        }
+
+        .settings-tab.active {
+            background: var(--highlight);
+            color: var(--accent);
+            font-weight: 700;
+        }
+
+        /* --- Business Info Content Form (Right) --- */
+        .settings-content {
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+        }
+
+        .section-box {
+            padding-bottom: 40px;
+            border-bottom: 1px solid var(--border);
+        }
+        .section-box:last-child { border-bottom: none; }
+
+        .section-header { margin-bottom: 24px; }
+        .section-title { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
+        .section-desc { font-size: 14px; color: var(--text-sub); }
+
+        /* Form Elements */
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+        }
+        .full-width { grid-column: 1 / -1; }
+
+        .form-group {
+            display: flex; flex-direction: column; gap: 8px;
+        }
+
+        .form-label {
+            font-size: 13px; font-weight: 600; color: var(--text-main);
+        }
+
+        .form-input {
+            padding: 12px; border: 1px solid var(--border); border-radius: 10px; font-size: 15px; color: var(--text-main); transition: 0.2s; font-family: inherit;
+        }
+        .form-input:focus { outline: none; border-color: var(--accent); }
+        .input-with-icon { display: flex; align-items: center; }
+        .input-with-icon .form-input { border-top-left-radius: 0; border-bottom-left-radius: 0; border-left: none; }
+        .input-prefix {
+            padding: 12px; background: var(--tag-bg); border: 1px solid var(--border); border-right: none; border-radius: 10px; border-top-right-radius: 0; border-bottom-right-radius: 0;
+            color: var(--text-sub); font-size: 15px; font-weight: 500;
+        }
+
+        /* Hours Grid */
+        .hours-grid {
+            display: grid;
+            grid-template-columns: 100px 1fr 1fr;
+            gap: 10px 20px;
+            align-items: center;
+        }
+        .day-label { font-weight: 500; font-size: 15px; }
+        .time-select { padding: 10px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px; color: var(--text-main); background-color: var(--bg); }
+        .hours-grid > div:nth-child(3n+1) { margin-top: 10px; } /* Small spacing for days */
+        .time-group { display: flex; align-items: center; gap: 8px; }
+        .closed-toggle {
+            display: flex; align-items: center; gap: 8px; font-size: 14px; color: var(--text-sub);
+        }
+
+        /* Buttons */
+        .btn-black {
+            padding: 12px 30px; background: var(--accent); color: #fff; border: none; border-radius: 10px; font-weight: 700; cursor: pointer; transition: 0.2s;
+        }
+        .btn-black:hover { opacity: 0.9; }
+
+        .btn-outline {
+            padding: 12px 24px; border: 1px solid var(--border); background: #fff; border-radius: 10px; font-weight: 600; cursor: pointer; transition: 0.2s;
+        }
+        .btn-outline:hover { background: var(--highlight); }
+
+    </style>
+</head>
+<body>
+
+    <nav class="sidebar">
+        <div>
+            <div class="logo">
+                <div style="width: 20px; height: 20px; background: #000; border-radius: 4px;"></div>
+                MonoSlot
+            </div>
+            <div class="nav-item"><i class="fa-regular fa-calendar" style="width: 20px;"></i> Dashboard</div>
+            <div class="nav-item"><i class="fa-solid fa-list-check" style="width: 20px;"></i> Requests</div>
+            <div class="nav-item"><i class="fa-regular fa-user" style="width: 20px;"></i> Clients</div>
+            <div class="nav-item active"><i class="fa-solid fa-cog" style="width: 20px;"></i> Settings</div>
+        </div>
+        <div class="user-mini">
+            <div class="user-avatar"></div>
+            <span style="font-size: 14px; font-weight: 600;">Dr. Ray</span>
+        </div>
+    </nav>
+
+    <main class="main">
+        
+        <h1 class="header-title">Settings</h1>
+
+        <div class="settings-container">
+            
+            <div class="settings-menu">
+                <div class="settings-tab"><i class="fa-regular fa-user"></i> Profile</div>
+                <div class="settings-tab active"><i class="fa-solid fa-store"></i> Business Info</div>
+                <div class="settings-tab"><i class="fa-regular fa-bell"></i> Notifications</div>
+                <div class="settings-tab"><i class="fa-solid fa-shield-halved"></i> Security</div>
+                <div class="settings-tab" style="color: var(--danger); margin-top: 20px;"><i class="fa-solid fa-arrow-right-from-bracket"></i> Log Out</div>
+            </div>
+
+            <div class="settings-content">
+                
+                <div class="section-box">
+                    <div class="section-header">
+                        <div class="section-title">General Details</div>
+                        <div class="section-desc">The name and unique URL for your booking portal.</div>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-group full-width">
+                            <label class="form-label">Practice Name</label>
+                            <input type="text" class="form-input" value="Ray Stantz Physical Therapy">
+                        </div>
+                        
+                        <div class="form-group full-width">
+                            <label class="form-label">Booking Page URL</label>
+                            <div class="input-with-icon">
+                                <span class="input-prefix">monoslot.com/</span>
+                                <input type="text" class="form-input" value="drraystantz">
+                            </div>
+                            <div style="font-size: 12px; color: var(--text-sub);">Your public booking link: monoslot.com/drraystantz</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section-box">
+                    <div class="section-header">
+                        <div class="section-title">Address & Location</div>
+                        <div class="section-desc">The physical location where you meet clients.</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Street Address</label>
+                        <input type="text" class="form-input" value="150 E 58th St">
+                    </div>
+                    
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="form-label">City</label>
+                            <input type="text" class="form-input" value="New York">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">State / Province</label>
+                            <input type="text" class="form-input" value="NY">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Zip / Postal Code</label>
+                            <input type="text" class="form-input" value="10155">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Country</label>
+                            <input type="text" class="form-input" value="United States">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section-box">
+                    <div class="section-header">
+                        <div class="section-title">Working Hours</div>
+                        <div class="section-desc">Define your default weekly availability for clients.</div>
+                    </div>
+                    
+                    <div class="hours-grid">
+                        <div style="grid-column: 1;"></div> 
+                        <div style="font-size: 13px; font-weight: 600;">Start Time</div>
+                        <div style="font-size: 13px; font-weight: 600;">End Time</div>
+
+                        <div class="day-label">Monday</div>
+                        <select class="time-select" style="grid-column: 2;">
+                            <option>9:00 AM</option>
+                        </select>
+                        <select class="time-select">
+                            <option>5:00 PM</option>
+                        </select>
+
+                        <div class="day-label">Tuesday</div>
+                        <select class="time-select" style="grid-column: 2;">
+                            <option>9:00 AM</option>
+                        </select>
+                        <select class="time-select">
+                            <option>5:00 PM</option>
+                        </select>
+
+                        <div class="day-label">Wednesday</div>
+                        <select class="time-select" style="grid-column: 2;">
+                            <option>9:00 AM</option>
+                        </select>
+                        <select class="time-select">
+                            <option>5:00 PM</option>
+                        </select>
+
+                        <div class="day-label">Thursday</div>
+                        <select class="time-select" style="grid-column: 2;">
+                            <option>9:00 AM</option>
+                        </select>
+                        <select class="time-select">
+                            <option>5:00 PM</option>
+                        </select>
+
+                        <div class="day-label">Friday</div>
+                        <select class="time-select" style="grid-column: 2;">
+                            <option>9:00 AM</option>
+                        </select>
+                        <select class="time-select">
+                            <option>3:00 PM</option>
+                        </select>
+
+                        <div class="day-label">Saturday</div>
+                        <div class="closed-toggle" style="grid-column: 2 / -1;">
+                            <input type="checkbox" checked style="width: 16px; height: 16px;">
+                            <span>Closed</span>
+                        </div>
+
+                        <div class="day-label">Sunday</div>
+                        <div class="closed-toggle" style="grid-column: 2 / -1;">
+                            <input type="checkbox" checked style="width: 16px; height: 16px;">
+                            <span>Closed</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="display: flex; justify-content: flex-end; gap: 15px; padding-top: 20px;">
+                    <button class="btn-outline">Cancel</button>
+                    <button class="btn-black">Save Changes</button>
+                </div>
+
+            </div>
+        </div>
+
+    </main>
+
+</body>
+</html>

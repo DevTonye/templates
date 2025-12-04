@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Service Details - MonoSlot</title>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --bg: #FFFFFF;
+            --text-main: #0F172A;
+            --text-sub: #64748B;
+            --accent: #000000;
+            --highlight: #F1F5F9;
+            --border: #E2E8F0;
+            --radius: 16px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Manrope', sans-serif; }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text-main);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* --- Sidebar & Nav (Reused Style) --- */
+        .sidebar {
+            width: 240px;
+            border-right: 1px solid var(--border);
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .logo { font-weight: 800; font-size: 22px; letter-spacing: -0.5px; margin-bottom: 50px; display: flex; align-items: center; gap: 10px; }
+        .nav-item { display: flex; align-items: center; gap: 12px; padding: 12px 0; color: var(--text-sub); font-weight: 500; cursor: pointer; transition: 0.2s; }
+        .nav-item:hover, .nav-item.active { color: var(--text-main); font-weight: 700; }
+        .user-mini { display: flex; align-items: center; gap: 10px; }
+        .user-avatar { width: 32px; height: 32px; background: #000; border-radius: 50%; }
+
+        /* --- Main Content Layout --- */
+        .main {
+            flex: 1;
+            padding: 40px;
+            overflow-y: auto;
+        }
+        
+        .header-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        
+        .header-title {
+            font-size: 32px;
+            font-weight: 800;
+            letter-spacing: -1px;
+        }
+        
+        .btn-black {
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            border: 1px solid var(--accent);
+            background: var(--accent);
+            color: #fff;
+            transition: 0.2s;
+        }
+        .btn-black:hover { opacity: 0.9; }
+
+        /* --- Service Card Grid --- */
+        .service-details-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr; /* Main form and settings panel */
+            gap: 40px;
+        }
+
+        .detail-card {
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 30px;
+            margin-bottom: 20px;
+            background: #fff;
+        }
+
+        .detail-card h3 {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--highlight);
+        }
+
+        /* Form Styling */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-sub);
+            margin-bottom: 8px;
+        }
+
+        .form-group input[type="text"],
+        .form-group input[type="number"],
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 16px;
+            color: var(--text-main);
+            transition: border-color 0.2s;
+        }
+        
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        .inline-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        /* Settings Panel */
+        .settings-panel {
+            grid-column: 2 / 3;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .setting-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid var(--highlight);
+        }
+
+        .setting-item:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+
+        .setting-label {
+            font-weight: 600;
+        }
+
+        .setting-value {
+            color: var(--text-sub);
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        .toggle-switch {
+            width: 40px;
+            height: 20px;
+            background: var(--border);
+            border-radius: 10px;
+            position: relative;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .toggle-switch.active {
+            background: var(--accent);
+        }
+
+        .toggle-switch .slider {
+            width: 16px;
+            height: 16px;
+            background: #fff;
+            border-radius: 50%;
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            transition: 0.2s;
+        }
+
+        .toggle-switch.active .slider {
+            transform: translateX(20px);
+        }
+
+        .delete-card {
+            margin-top: auto;
+            border: 1px solid #FECACA;
+            background: #FEF2F2;
+            color: #EF4444;
+        }
+
+        .delete-card button {
+            background: #EF4444;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        
+        @media (max-width: 900px) {
+            .service-details-grid {
+                grid-template-columns: 1fr;
+            }
+            .settings-panel {
+                grid-column: 1 / 2;
+                margin-top: 20px;
+            }
+        }
+        
+    </style>
+</head>
+<body>
+
+    <nav class="sidebar">
+        <div>
+            <div class="logo">
+                <div style="width: 20px; height: 20px; background: #000; border-radius: 4px;"></div>
+                MonoSlot
+            </div>
+            <div class="nav-item"><i class="fa-regular fa-calendar" style="width: 20px;"></i> Dashboard</div>
+            <div class="nav-item active"><i class="fa-solid fa-list-check" style="width: 20px;"></i> Services</div>
+            <div class="nav-item"><i class="fa-regular fa-user" style="width: 20px;"></i> Clients</div>
+            <div class="nav-item"><i class="fa-solid fa-chart-simple" style="width: 20px;"></i> Analytics</div>
+        </div>
+        <div class="user-mini">
+            <div class="user-avatar"></div>
+            <span style="font-size: 14px; font-weight: 600;">Dr. Ray</span>
+        </div>
+    </nav>
+
+    <main class="main">
+        
+        <div class="header-section">
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <i class="fa-solid fa-arrow-left" style="font-size: 20px; cursor: pointer;"></i>
+                <h1 class="header-title">Edit Service: Deep Tissue Massage</h1>
+            </div>
+            <button class="btn-black">Save Changes</button>
+        </div>
+
+        <div class="service-details-grid">
+            
+            <div class="main-form">
+                
+                <div class="detail-card">
+                    <h3>Service Information</h3>
+                    
+                    <div class="form-group">
+                        <label for="service-name">Service Name</label>
+                        <input type="text" id="service-name" value="Deep Tissue Massage">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="service-description">Description (Visible to Clients)</label>
+                        <textarea id="service-description">A focused, therapeutic massage targeting chronic muscle tension and knots. Ideal for athletes or those with deep-seated discomfort.</textarea>
+                    </div>
+                </div>
+
+                <div class="detail-card">
+                    <h3>Pricing & Duration</h3>
+                    <div class="inline-grid">
+                        <div class="form-group">
+                            <label for="duration">Duration (Minutes)</label>
+                            <input type="number" id="duration" value="90">
+                        </div>
+                        <div class="form-group">
+                            <label for="price">Price (USD)</label>
+                            <input type="number" id="price" value="125.00">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="buffer">Buffer Time After Appointment (Minutes)</label>
+                        <input type="number" id="buffer" value="15" placeholder="Time for cleanup or travel">
+                    </div>
+                </div>
+            </div>
+
+            <div class="settings-panel">
+                
+                <div class="detail-card">
+                    <h3>Status & Visibility</h3>
+                    <div class="setting-item">
+                        <span class="setting-label">Active / Bookable</span>
+                        <div class="toggle-switch active"><div class="slider"></div></div>
+                    </div>
+                    <div class="setting-item">
+                        <span class="setting-label">Online Booking</span>
+                        <div class="toggle-switch active"><div class="slider"></div></div>
+                    </div>
+                    <div class="setting-item">
+                        <span class="setting-label">Requires Approval</span>
+                        <div class="toggle-switch"><div class="slider"></div></div>
+                    </div>
+                </div>
+                
+                <div class="detail-card">
+                    <h3>Location & Type</h3>
+                    <div class="setting-item">
+                        <span class="setting-label">Type</span>
+                        <span class="setting-value">In-Person</span>
+                    </div>
+                    <div class="setting-item">
+                        <span class="setting-label">Category</span>
+                        <span class="setting-value">Therapy</span>
+                    </div>
+                </div>
+
+                <div class="detail-card delete-card">
+                    <h3>Danger Zone</h3>
+                    <p style="font-size: 14px; margin-bottom: 15px;">Permanently remove this service from your offerings. This cannot be undone.</p>
+                    <button>Delete Service</button>
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+
+</body>
+</html>

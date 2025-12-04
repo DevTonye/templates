@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Service Saved - MonoSlot</title>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --bg: #FFFFFF;
+            --text-main: #0F172A;
+            --text-sub: #64748B;
+            --accent: #000000;
+            --highlight: #F1F5F9;
+            --border: #E2E8F0;
+            --radius: 16px;
+            --green: #22C55E;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Manrope', sans-serif; }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text-main);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* --- Reused Sidebar --- */
+        .sidebar { width: 240px; border-right: 1px solid var(--border); padding: 30px; display: flex; flex-direction: column; justify-content: space-between; }
+        .logo { font-weight: 800; font-size: 22px; letter-spacing: -0.5px; margin-bottom: 50px; display: flex; align-items: center; gap: 10px; }
+        .nav-item { display: flex; align-items: center; gap: 12px; padding: 12px 0; color: var(--text-sub); font-weight: 500; cursor: pointer; transition: 0.2s; }
+        .nav-item:hover, .nav-item.active { color: var(--text-main); font-weight: 700; }
+        .user-mini { display: flex; align-items: center; gap: 10px; }
+        .user-avatar { width: 32px; height: 32px; background: #000; border-radius: 50%; }
+
+        /* --- Main Content --- */
+        .main {
+            flex: 1;
+            padding: 40px;
+            overflow-y: auto;
+            position: relative; /* For Toast positioning */
+        }
+        
+        .header-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .breadcrumb {
+            font-size: 14px; color: var(--text-sub); margin-bottom: 8px; font-weight: 600;
+        }
+        
+        .header-title {
+            font-size: 32px; font-weight: 800; letter-spacing: -1px; display: flex; align-items: center; gap: 15px;
+        }
+
+        .status-badge {
+            font-size: 14px; background: #D1FAE5; color: var(--green); padding: 4px 12px; border-radius: 100px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;
+        }
+        
+        .btn-outline {
+            padding: 10px 20px; border-radius: 12px; font-weight: 600; cursor: pointer; border: 1px solid var(--border); background: #fff; color: var(--text-main); transition: 0.2s;
+        }
+        .btn-outline:hover { background: var(--highlight); }
+
+        .btn-black {
+            padding: 10px 20px; border-radius: 12px; font-weight: 600; cursor: pointer; border: 1px solid var(--accent); background: var(--accent); color: #fff; transition: 0.2s;
+        }
+        .btn-black:hover { opacity: 0.9; }
+
+        /* --- Info Grid --- */
+        .view-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 40px;
+        }
+
+        .info-card {
+            border: 1px solid var(--border); border-radius: var(--radius); padding: 30px; margin-bottom: 20px; background: #fff;
+        }
+
+        .info-card h3 {
+            font-size: 16px; font-weight: 700; color: var(--text-sub); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 20px; border-bottom: 1px solid var(--highlight); padding-bottom: 10px;
+        }
+
+        .data-row {
+            margin-bottom: 24px;
+        }
+        .data-row:last-child { margin-bottom: 0; }
+
+        .data-label { font-size: 13px; font-weight: 600; color: var(--text-sub); margin-bottom: 6px; }
+        .data-value { font-size: 16px; font-weight: 500; color: var(--text-main); line-height: 1.6; }
+        .data-value.large { font-size: 24px; font-weight: 700; }
+
+        /* Client Preview Card (How it looks to customers) */
+        .preview-box {
+            background: var(--highlight);
+            border-radius: var(--radius);
+            padding: 24px;
+            margin-top: 10px;
+        }
+        .preview-header { font-size: 12px; font-weight: 700; color: var(--text-sub); margin-bottom: 12px; text-transform: uppercase; }
+        
+        .client-card-mock {
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+        .mock-top { display: flex; justify-content: space-between; margin-bottom: 8px; }
+        .mock-price { font-weight: 700; }
+        .mock-title { font-weight: 800; font-size: 18px; margin-bottom: 8px; }
+        .mock-meta { font-size: 13px; color: var(--text-sub); display: flex; gap: 12px; }
+
+        /* --- Success Toast Notification --- */
+        .toast-notification {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #000;
+            color: #fff;
+            padding: 16px 24px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            animation: slideIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 1000;
+        }
+
+        .toast-icon {
+            width: 24px; height: 24px; background: var(--green); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 12px;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(100px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+    </style>
+</head>
+<body>
+
+    <nav class="sidebar">
+        <div>
+            <div class="logo">
+                <div style="width: 20px; height: 20px; background: #000; border-radius: 4px;"></div>
+                MonoSlot
+            </div>
+            <div class="nav-item"><i class="fa-regular fa-calendar" style="width: 20px;"></i> Dashboard</div>
+            <div class="nav-item active"><i class="fa-solid fa-list-check" style="width: 20px;"></i> Services</div>
+            <div class="nav-item"><i class="fa-regular fa-user" style="width: 20px;"></i> Clients</div>
+            <div class="nav-item"><i class="fa-solid fa-chart-simple" style="width: 20px;"></i> Analytics</div>
+        </div>
+        <div class="user-mini">
+            <div class="user-avatar"></div>
+            <span style="font-size: 14px; font-weight: 600;">Dr. Ray</span>
+        </div>
+    </nav>
+
+    <main class="main">
+        
+        <div class="header-section">
+            <div>
+                <div class="breadcrumb"><i class="fa-solid fa-arrow-left"></i> Back to Catalog</div>
+                <h1 class="header-title">
+                    Deep Tissue Massage
+                    <span class="status-badge">Active</span>
+                </h1>
+            </div>
+            <div style="display: flex; gap: 12px;">
+                <button class="btn-outline">Preview Booking</button>
+                <button class="btn-black"><i class="fa-solid fa-pen"></i> Edit Service</button>
+            </div>
+        </div>
+
+        <div class="view-grid">
+            
+            <div class="left-col">
+                <div class="info-card">
+                    <h3>Service Details</h3>
+                    <div class="data-row">
+                        <div class="data-label">Description</div>
+                        <div class="data-value">A focused, therapeutic massage targeting chronic muscle tension and knots. Ideal for athletes or those with deep-seated discomfort. We use specialized oils and pressure techniques to release tension.</div>
+                    </div>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                        <div class="data-row">
+                            <div class="data-label">Duration</div>
+                            <div class="data-value large">90 <span style="font-size: 16px; font-weight: 500; color: var(--text-sub);">min</span></div>
+                        </div>
+                        <div class="data-row">
+                            <div class="data-label">Price</div>
+                            <div class="data-value large">$125.00</div>
+                        </div>
+                    </div>
+
+                    <div class="data-row" style="margin-top: 20px;">
+                        <div class="data-label">Buffer Time</div>
+                        <div class="data-value"><i class="fa-regular fa-hourglass-half"></i> 15 minutes post-appointment</div>
+                    </div>
+                </div>
+
+                <div class="info-card">
+                    <h3>Performance</h3>
+                    <div style="display: flex; gap: 40px;">
+                        <div>
+                            <div class="data-label">Total Bookings</div>
+                            <div class="data-value large">142</div>
+                        </div>
+                        <div>
+                            <div class="data-label">Revenue Generated</div>
+                            <div class="data-value large">$17,750</div>
+                        </div>
+                        <div>
+                            <div class="data-label">Avg. Rating</div>
+                            <div class="data-value large">4.9 <span style="font-size: 14px; color: #F59E0B;">★</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="right-col">
+                <div class="info-card">
+                    <h3>Configuration</h3>
+                    <div class="data-row">
+                        <div class="data-label">Category</div>
+                        <div class="data-value">Therapy</div>
+                    </div>
+                    <div class="data-row">
+                        <div class="data-label">Online Booking</div>
+                        <div class="data-value"><i class="fa-solid fa-check" style="color: var(--green);"></i> Enabled</div>
+                    </div>
+                    <div class="data-row">
+                        <div class="data-label">Staff Assigned</div>
+                        <div class="data-value">3 Providers</div>
+                    </div>
+                </div>
+
+                <div class="preview-box">
+                    <div class="preview-header">Client View Preview</div>
+                    <div class="client-card-mock">
+                        <div class="mock-top">
+                            <span style="font-size: 12px; font-weight: 700; color: var(--text-sub);">THERAPY</span>
+                            <span class="mock-price">$125</span>
+                        </div>
+                        <div class="mock-title">Deep Tissue Massage</div>
+                        <div class="mock-meta">
+                            <span><i class="fa-regular fa-clock"></i> 90 Mins</span>
+                            <span><i class="fa-solid fa-video"></i> In-Person</span>
+                        </div>
+                        <div style="margin-top: 16px; width: 100%; background: #000; color: #fff; text-align: center; padding: 10px; border-radius: 8px; font-size: 14px; font-weight: 600;">Book Now</div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="toast-notification">
+            <div class="toast-icon"><i class="fa-solid fa-check"></i></div>
+            <div>
+                <div style="font-weight: 700; font-size: 14px;">Changes Saved</div>
+                <div style="font-size: 12px; opacity: 0.8;">Service updated successfully.</div>
+            </div>
+            <i class="fa-solid fa-xmark" style="margin-left: 10px; cursor: pointer; opacity: 0.5;"></i>
+        </div>
+
+    </main>
+
+</body>
+</html>
